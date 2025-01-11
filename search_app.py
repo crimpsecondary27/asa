@@ -9,7 +9,7 @@ def perform_search(query, search_type="text", max_results=10):
     """
     api_url = "https://api.brave.com/search"  # Brave Search API endpoint
     headers = {
-        "Authorization": "Bearer YOUR_API_KEY_HERE",  # Replace with your Brave API key
+        "Authorization": "Bearer BSAYheekFJaSF7P3QDGHUyJQnCFahzW",  # Replace with your Brave API key
     }
 
     params = {
