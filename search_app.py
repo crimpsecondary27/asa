@@ -1,8 +1,7 @@
 import streamlit as st
 import requests
-import time
 
-# Function to perform search using Brave Search
+# Function to perform search using Brave Search API
 def perform_search(query, search_type="text", max_results=10):
     """
     Perform a search using Brave Search API
@@ -19,10 +18,14 @@ def perform_search(query, search_type="text", max_results=10):
     }
 
     try:
-        response = requests.get(api_url, headers=headers, params=params)
-        response.raise_for_status()  # Raises HTTPError for bad responses (4xx, 5xx)
-        data = response.json()
+        # Adding timeout to prevent hanging indefinitely
+        response = requests.get(api_url, headers=headers, params=params, timeout=10)
+        response.raise_for_status()  # Raise error for bad status codes (4xx, 5xx)
+        data = response.json()  # Get JSON response
         return data.get('results', [])
+    except requests.exceptions.Timeout:
+        st.error("The request timed out. Please try again later.")
+        return []
     except requests.exceptions.RequestException as e:
         st.error(f"Search error: {str(e)}")
         return []
