@@ -1,26 +1,33 @@
 import streamlit as st
-from duckduckgo_search import DDGS
+import requests
 import time
 
+# Function to perform search using Brave Search
 def perform_search(query, search_type="text", max_results=10):
     """
-    Perform a search using DuckDuckGo
+    Perform a search using Brave Search API
     """
-    with DDGS() as ddgs:
-        try:
-            if search_type == "text":
-                results = list(ddgs.text(query, max_results=max_results))
-            elif search_type == "image":
-                results = list(ddgs.images(query, max_results=max_results))
-            elif search_type == "news":
-                results = list(ddgs.news(query, max_results=max_results))
-            elif search_type == "video":
-                results = list(ddgs.videos(query, max_results=max_results))
-            return results
-        except Exception as e:
-            st.error(f"Search error: {str(e)}")
-            return []
+    api_url = "https://api.brave.com/search"  # Brave Search API endpoint
+    headers = {
+        "Authorization": "Bearer YOUR_API_KEY_HERE",  # Replace with your Brave API key
+    }
 
+    params = {
+        "q": query,
+        "count": max_results,
+        "type": search_type  # text, image, video, or news
+    }
+
+    try:
+        response = requests.get(api_url, headers=headers, params=params)
+        response.raise_for_status()  # Raises HTTPError for bad responses (4xx, 5xx)
+        data = response.json()
+        return data.get('results', [])
+    except requests.exceptions.RequestException as e:
+        st.error(f"Search error: {str(e)}")
+        return []
+
+# Functions to display results
 def display_text_result(result):
     """
     Display a text search result with title, link, and snippet
@@ -66,13 +73,13 @@ def display_video_result(result):
 def main():
     # Set page config
     st.set_page_config(
-        page_title="DuckDuckGo Search",
+        page_title="Brave Search",
         page_icon="🔍",
         layout="wide"
     )
 
     # Custom CSS
-    st.markdown("""
+    st.markdown(""" 
         <style>
         .stButton>button {
             width: 100%;
@@ -89,7 +96,7 @@ def main():
     """, unsafe_allow_html=True)
 
     # Title
-    st.title("🔍 DuckDuckGo Search")
+    st.title("🔍 Brave Search")
 
     # Search interface
     col1, col2 = st.columns([3, 1])
@@ -135,7 +142,7 @@ def main():
     st.markdown(
         """
         <div style='text-align: center; color: gray; padding: 20px;'>
-        Made with Streamlit and duckduckgo-search
+        Made with Streamlit and Brave Search API
         </div>
         """,
         unsafe_allow_html=True
